@@ -1,106 +1,133 @@
-_schema-version: '3.1'
+_schema-version: "3.1"
 ID: deductions
 description: A simple CAP project.
 version: 1.0.0
 modules:
-  - name: deductions-srv
-    type: nodejs
-    path: srv
-    requires:
-      - name: deductions-db
-      - name: deductions-destination-service
-      - name: uaa_deductions
-    provides:
-      - name: srv-api
-        properties:
-          srv-url: '${default-url}'
+- name: deductions-srv
+  type: nodejs
+  path: srv
+  requires:
+  - name: deductions-db
+  - name: deductions-destination-service
+  - name: uaa_deductions
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+- name: deductions-db-deployer
+  type: hdb
+  path: db
+  requires:
+  - name: deductions-db
+  parameters:
+    buildpack: nodejs_buildpack
+- name: deductions-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: deductions-destination-service
     parameters:
-      buildpack: nodejs_buildpack
-  - name: deductions-db-deployer
-    type: hdb
-    path: db
-    requires:
-      - name: deductions-db
+      content-target: true
+  - name: deductions_html_repo_host
     parameters:
-      buildpack: nodejs_buildpack
-  - name: deductions-destination-content
-    type: com.sap.application.content
-    requires:
-      - name: deductions-destination-service
-        parameters:
-          content-target: true
-      - name: deductions_html_repo_host
-        parameters:
-          service-key:
-            name: deductions_html_repo_host-key
-      - name: uaa_deductions
-        parameters:
-          service-key:
-            name: uaa_deductions-key
+      service-key:
+        name: deductions_html_repo_host-key
+  - name: uaa_deductions
     parameters:
-      content:
+      service-key:
+        name: uaa_deductions-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: deductions_deductions_html_repo_host
+          ServiceInstanceName: deductions-html5-app-host-service
+          ServiceKeyName: deductions_html_repo_host-key
+          sap.cloud.service: deductions
+        - Authentication: OAuth2UserTokenExchange
+          Name: deductions_uaa_deductions
+          ServiceInstanceName: deductions-xsuaa-service
+          ServiceKeyName: uaa_deductions-key
+          sap.cloud.service: deductions
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: deductions-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: deductions_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - deductionsui.zip
+      name: deductionsui
+      target-path: resources/
+- name: deductionsui
+  type: html5
+  path: app/deductionsui
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+  requires:
+    - name: uaa_deductions
+resources:
+- name: deductions-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+  properties:
+    hdi-service-name: ${service-name}
+- name: deductions-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
         instance:
           destinations:
-            - Name: deductions_deductions_html_repo_host
-              ServiceInstanceName: deductions-html5-app-host-service
-              ServiceKeyName: deductions_html_repo_host-key
-              sap.cloud.service: deductions
-            - Authentication: OAuth2UserTokenExchange
-              Name: deductions_uaa_deductions
-              ServiceInstanceName: deductions-xsuaa-service
-              ServiceKeyName: uaa_deductions-key
-              sap.cloud.service: deductions
-          existing_destinations_policy: ignore
-    build-parameters:
-      no-source: true
-resources:
-  - name: deductions-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
-    properties:
-      hdi-service-name: '${service-name}'
-  - name: deductions-destination-service
-    type: org.cloudfoundry.managed-service
-    requires:
-      - name: srv-api
-    parameters:
-      config:
-        HTML5Runtime_enabled: true
-        init_data:
-          instance:
-            destinations:
-              - Authentication: NoAuthentication
-                HTML5.DynamicDestination: true
-                HTML5.ForwardAuthToken: true
-                Name: deductions-srv-api
-                ProxyType: Internet
-                Type: HTTP
-                URL: '~{srv-api/srv-url}'
-            existing_destinations_policy: update
-        version: 1.0.0
-      service: destination
-      service-name: deductions-destination-service
-      service-plan: lite
-  - name: deductions_html_repo_host
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: html5-apps-repo
-      service-name: deductions-html5-app-host-service
-      service-plan: app-host
-  - name: uaa_deductions
-    type: org.cloudfoundry.managed-service
-    parameters:
-      path: ./xs-security.json
-      service: xsuaa
-      service-name: deductions-xsuaa-service
-      service-plan: application
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: deductions-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: '~{srv-api/srv-url}'
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: deductions-destination-service
+    service-plan: lite
+  requires:
+  - name: srv-api
+- name: deductions_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: deductions-html5-app-host-service
+    service-plan: app-host
+- name: uaa_deductions
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: deductions-xsuaa-service
+    service-plan: application
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm install --production
-        - npx -p @sap/cds-dk cds build --production
+  - builder: custom
+    commands:
+    - npm install --production
+    - npx -p @sap/cds-dk cds build --production

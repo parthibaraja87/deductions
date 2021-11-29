@@ -1,0 +1,75 @@
+{
+  "namespace": "app.deductions",
+  "definitions": {
+    "app.deductions.Deductions": {
+      "kind": "entity",
+      "elements": {
+        "PERSONNEL_NUMBER": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "WAGETYPE": {
+          "type": "cds.Integer"
+        },
+        "WAGETYPEDESC": {
+          "type": "cds.String",
+          "length": 100
+        },
+        "AMOUNT": {
+          "type": "cds.Integer"
+        },
+        "CURRENCY": {
+          "type": "cds.String",
+          "length": 10
+        },
+        "WBSE": {
+          "type": "cds.String",
+          "length": 20
+        }
+      }
+    },
+    "CatelogService": {
+      "@source": "deductions.cds",
+      "kind": "service"
+    },
+    "CatelogService.Deductions": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "app.deductions.Deductions"
+          ]
+        }
+      },
+      "elements": {
+        "PERSONNEL_NUMBER": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "WAGETYPE": {
+          "type": "cds.Integer"
+        },
+        "WAGETYPEDESC": {
+          "type": "cds.String",
+          "length": 100
+        },
+        "AMOUNT": {
+          "type": "cds.Integer"
+        },
+        "CURRENCY": {
+          "type": "cds.String",
+          "length": 10
+        },
+        "WBSE": {
+          "type": "cds.String",
+          "length": 20
+        }
+      }
+    }
+  },
+  "meta": {
+    "creator": "CDS Compiler v2.10.4",
+    "flavor": "inferred"
+  },
+  "$version": "2.0"
+}

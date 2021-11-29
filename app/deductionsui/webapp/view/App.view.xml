@@ -1,0 +1,56 @@
+<mvc:View
+    controllerName="deductionsui.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+>
+	<Shell id="shell">
+		<App id="app">
+			<pages>
+				<Page id="page" title="{i18n>title}">
+					<content>
+                        <Table id="itemsTable" class="sapUiResponsiveContentPadding sapUiSizeCompact" items="{path : '/Deductions'}" updateFinished="onTableUpdateFinished">
+		                    <headerToolbar>
+			                    <Toolbar>
+				                    <Title text="Deduction Items" level="H2"/>
+			                    </Toolbar>
+		                    </headerToolbar>
+		                    <columns>
+			                    <Column>
+				                    <Text text="Personal Number" />
+			                    </Column>
+			                    <Column>
+				                    <Text text="Wage Type" />
+			                    </Column>
+			                    <Column>
+				                    <Text text="Wage Type Description" />
+			                    </Column>
+                                <Column>
+				                    <Text text="Amount" />
+			                    </Column>
+                                <Column>
+				                    <Text text="Curreny" />
+			                    </Column>
+                                <Column>
+				                    <Text text="WBSE" />
+			                    </Column>
+                            </columns>
+		                    <items>
+			                    <ColumnListItem>
+				                    <cells>
+					                    <Text text="{PERSONNEL_NUMBER}" />
+                                        <Text text="{WAGETYPE}"/>
+                                        <Text text="{WAGETYPEDESC}"/>
+                                         <Text text="{AMOUNT}"/>
+                                         <Text text="{CURRENCY}"/>
+                                         <Text text="{WBSE}"/>
+                                    </cells>
+			                    </ColumnListItem>
+		                    </items>
+	                    </Table> 
+                    </content>
+				</Page>
+			</pages>
+		</App>
+	</Shell>
+</mvc:View>

@@ -1,0 +1,1 @@
+using CatelogService as service from '../../srv/deductions';

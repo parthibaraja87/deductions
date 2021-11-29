@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:DataServices>
+        <Schema Namespace="CatelogService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="Deductions" EntityType="CatelogService.Deductions"/>
+            </EntityContainer>
+            <EntityType Name="Deductions">
+                <Key>
+                    <PropertyRef Name="PERSONNEL_NUMBER"/>
+                </Key>
+                <Property Name="PERSONNEL_NUMBER" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="WAGETYPE" Type="Edm.Int32"/>
+                <Property Name="WAGETYPEDESC" Type="Edm.String" MaxLength="100"/>
+                <Property Name="AMOUNT" Type="Edm.Int32"/>
+                <Property Name="CURRENCY" Type="Edm.String" MaxLength="10"/>
+                <Property Name="WBSE" Type="Edm.String" MaxLength="20"/>
+            </EntityType>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
